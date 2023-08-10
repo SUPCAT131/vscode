@@ -26,6 +26,12 @@ typedef struct  // 上述结构体封装为一个总结构体
     char flg; //标志位 [0] r_m有内容 [1] k_m有内容 [2] 控制设备有内容 0000 0111 表示全有内容
 }big_msgt;      
 
+typedef struct
+{
+    long mtype;     //消息的类型，必须大于0
+    big_msgt* msg;
+}msg_t;
+
 
 
 #endif

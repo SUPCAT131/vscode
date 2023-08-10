@@ -1,7 +1,11 @@
 #include "../include/cgic.h"
 #include "../include/pjct.h"
 #include <string.h>
-#include <stdlib.h>
+#include <stdlib.h>     // atoi
+
+#include <sys/ipc.h>
+#include <sys/msg.h>    // 消息队列
+
 
 char c_temp_up[40]={0};
 char c_temp_low[40]={0};
@@ -18,8 +22,6 @@ int illu_up=0;
 int illu_low=0;
 void showmsg()
 {
-    
-    
     printf("<html>\n");
     printf("<head><title>CGI Output</title></head>\n");
     printf("<body>\n");
@@ -35,7 +37,15 @@ void showmsg()
     printf("</body>\n");
     printf("</html>\n");
 }
-
+void showerr(char *errmsg)
+{
+    printf("<html>\n");
+    printf("<head><title>CGI Output</title></head>\n");
+    printf("<body>\n");
+    printf("<p>errmsg : %s</p>",errmsg);
+    printf("</body>\n");
+    printf("</html>\n");
+}
 int cgiMain(int argc, const char *argv[])
 {
     cgiFormString("temp_up",c_temp_up,sizeof(c_temp_up));
@@ -63,7 +73,30 @@ int cgiMain(int argc, const char *argv[])
         .flg=0x1<<1,
     };
 
-    
+    // 创建消息队列
+    key_t key;
+    int msgqid;
+        // 1. 获取键值
+    key=ftok("/www/home",'s');
+    if(key==-1)
+    {
+        showerr("get error key");
+        return 0;
+    }
+        // 2. 创建消息队列
+    msgqid = msgget(key, IPC_CREAT | 0666);
+    if(msgqid == -1)
+    {
+        showerr("get msgget error");
+        return 0;
+    }
+        // 3.向消息队列中发消息
+    int ret;
+    msg_t msg1;
+    msg1.mtype = 1;
+    msg1.msg=&bigms;
 
+    msgsnd(msgqid, &msg1, sizeof(bigms), 0);
+    
     return 0;
 }

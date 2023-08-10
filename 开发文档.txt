@@ -33,7 +33,9 @@ big_msgt 上述结构体封装为一个总结构体
         获取湿度上下限
         获取光强上下限
         封装到 big_msg 的 k_m 中 flg[1] 置1
-        发送到消息队列 's' set value
+        发送到消息队列 's' set value    
+            key=ftok("/www/home",'s');
+            msg.mtype = 1;
     --提交2.cgi
         获取照明控制信息 从页面
         获取风扇控制信息
