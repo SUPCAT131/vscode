@@ -1,0 +1,1 @@
+sudo cp $1.cgi ~/rootfs/www/cgi-bin/
