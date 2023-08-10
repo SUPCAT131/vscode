@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智慧云系统-99组</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1vh 0;
+    flex: 1;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: row;
+    flex: 8;
+    background-color: transparent;
+  }
+
+  .function {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    padding: 2vh;
+    margin: 2vh;
+    flex: 8;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .section {
+    background-color: rgba(200, 200, 200, 0.5);
+    backdrop-filter: blur(5px);
+    border: 1px solid #ddd;
+    padding: 2vh;
+    flex: 1;
+    margin-left: 2vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1vh 0;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .scroll-wrapper {
+    overflow: hidden;
+  }
+
+  .scrolling-text {
+    white-space: nowrap;
+    overflow: hidden;
+    animation: scrollingText 10s linear infinite;
+    max-width: 100%;
+  }
+
+  @keyframes scrollingText {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  a {
+    transition: transform 0.2s ease-in-out;
+    text-decoration: none;
+    border: 2px solid #ccc;
+    padding: 0.2em 0.5em;
+    display: inline-block;
+  }
+
+  a:hover {
+    transform: scale(1.1);
+    background-color: rgba(200, 200, 255, 0.5);
+  }
+
+  .login-container {
+     background-color: rgba(255, 255, 255, 0.5); /* 使用带透明度的白色背景 */
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 300px;
+  margin: 0 auto; /* 水平居中 */
+  }
+
+  .login-input {
+    width: 95%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  .login-button {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px; /* 添加字体大小 */
+  width: 100%; /* 设置按钮宽度为100% */
+}
+
+.login-button:hover {
+  background-color: #555;
+}
+.table-container {
+    background-color: rgba(255, 255, 255, 0.5); /* 使用带透明度的白色背景 */
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>欢迎使用 双倍6翻了 系统</h1>
+</header>
+<canvas id="canvas"></canvas>
+<div class="content">
+  <div class="function">
+    <!--<div class="section">
+       第一个小区域内容 
+    </div>-->
+    <div class="section login-container">
+      <form action="cgi-bin/login.cgi" method = "POST" >
+      <!-- 第一个小区域内容 -->
+      <h2>用户登录</h2>
+      <input type="text" name="ID" class="login-input" placeholder="用户名">
+      <input type="password" name="PASSWORD" class="login-input" placeholder="密码">
+      <input type="submit" name="login_button" value="登 录" class="login-button">
+      </form>
+    </div>
+    <!--<div class="section">
+       第二个小区域内容 
+    </div>-->
+    <div class="section table-container">
+      <h2>组员</h2>
+      <table>
+        <tr>
+          <td>组员1</td>
+          <td>组员2</td>
+          <td>组员3</td>
+          <td>组员4</td>
+        </tr>
+      </table>
+      <h2>分工</h2>
+      <table>
+        <tr>
+          <th style="width: 25%;">分配</th>
+          <th style="width: 75%;">成员</th>
+        </tr>
+        <tr>
+          <td>驱动</td>
+          <td>任务3</td>
+        </tr>
+        <tr>
+          <td>应用</td>
+          <td>任务3</td>
+        </tr>
+          </table>
+        </div>
+    <div class="section">
+      <!-- 第三个小区域内容 -->
+      <p> 工作记录待开发</p>
+    </div>
+  </div>
+</div>
+<div class="footer">
+  <div class="scroll-wrapper">
+    <div class="scrolling-text">
+      <p>版权声明 © 2023 hqjy-23032-99组 保留所有权利。</p>
+    </div>
+  </div>
+</div>
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+  const numParticles = 100;
+  const connectionDistance = 50;
+
+  function Particle(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = Math.random() * 0.5 - 0.25;
+    this.vy = Math.random() * 0.5 - 0.25;
+  }
+
+  Particle.prototype.update = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+  };
+
+  Particle.prototype.draw = function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#333';
+    ctx.fill();
+    ctx.closePath();
+  };
+
+  function drawLine(p1, p2) {
+    const dx = p1.x - p2.x;
+    const dy = p1.y - p2.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= connectionDistance) {
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.strokeStyle = '#333';
+      ctx.stroke();
+      ctx.closePath();
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+      for (let j = i + 1; j < particles.length; j++) {
+        drawLine(particles[i], particles[j]);
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+
+  function init() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight * 0.7;
+
+    for (let i = 0; i < numParticles; i++) {
+      particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height));
+    }
+
+    animate();
+  }
+
+  init();
+</script>
+</body>
+</html>

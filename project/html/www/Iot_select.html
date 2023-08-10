@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>功能选择页</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+  header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1vh 0;
+    flex: 1;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: row;
+    flex: 8;
+    background-color: transparent;
+  }
+
+  .function {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    padding: 2vh;
+    margin: 2vh;
+    flex: 8;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .section {
+    background-color: rgba(200, 200, 200, 0.5); /* 设置半透明的淡蓝色背景 */
+    backdrop-filter: blur(5px); /* 添加背景模糊效果 */
+    border: 1px solid #ddd;
+    padding: 2vh;
+    flex: 1;
+    margin-left: 2vh;
+
+    display: flex; /* 使用 Flex 布局 */
+    flex-direction: column; /* 设置为垂直排列 */
+    justify-content: center; /* 垂直居中 */
+  }
+  .section p
+  {
+    text-align:center;
+    font-size: 1.5vw; /* 使用相对单位 vw，您也可以尝试使用 vh */
+  }
+  .footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1vh 0;
+    overflow: hidden;
+    flex: 1;
+
+  }
+.scroll-wrapper{
+  overflow: hidden;
+}
+
+  .scrolling-text {
+    white-space: nowrap;
+    overflow: hidden;
+    animation: scrollingText 10s linear infinite;
+    max-width: 100%; /* 设置最大宽度 */
+  }
+
+  @keyframes scrollingText {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+   .section.links {
+    text-align: center; /* 文本居中显示 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 垂直居中显示 */
+  }
+  
+  .section.links a {
+    display: block; /* 每个链接独立一行 */
+    font-size: 2vw; /* 自适应放大字体 */
+    margin-bottom: 2rem; /* 添加一些间距 */
+  }
+  .section.links a:first-child {
+    margin-top: 1rem; /* 设置第一个链接的上外边距 */
+  }
+  a{
+    transition: transform 0.2s ease-in-out;
+    text-decoration: none;
+   border: 2px solid #ccc;
+    padding: 0.1em 0.5em;
+    display: inline-block;
+    width: 8em;
+    position: relative;
+  }
+  a:hover {
+  transform: scale(1.1); /* 在鼠标悬停时缩放 */
+  background-color: rgba(173, 216, 230, 0.5); /* 鼠标悬停时的毛玻璃淡蓝背景颜色 */
+
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>功能选择页</h1>
+</header>
+<canvas id="canvas"></canvas>
+<div class="content">
+  <div class="function">
+    <div class="section">
+      <!-- 第一个小区域内容 -->
+    </div>
+    <div class="section">
+      <!-- 第二个小区域内容 -->
+      <h2>Iot 应用选择说明:</h2>
+      <p>仓储应用： 适用于物联仓储类项目</p>
+      <p>家居应用： 适用于智能家居类项目</p>
+      <p>农业应用： 适用于智慧农业类项目</p>
+      <p>环测应用： 适用于环境监测类项目</p>
+    </div>
+    <div class="section links"><!-- 添加 links 类名 -->
+      <!-- 第三个小区域内容 -->
+      <a href="./1.html">仓储应用</a>
+      <a href="../home/home_select.html">家居应用</a>
+      <a href="./3.html">农业应用</a>
+      <a href="./4.html">环测应用</a>
+      <p><a href="./index.html">返回登录</a></p>
+    </div>
+  </div>
+</div>
+<div class="footer">
+  <div class="scroll-wrapper">
+    <div class="scrolling-text">
+      <p>版权声明 © 2023 您的公司名称。保留所有权利。</p>
+    </div>
+  </div> 
+</div>
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+  const numParticles = 100;
+  const connectionDistance = 50;
+
+  function Particle(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = Math.random() * 0.5 - 0.25;
+    this.vy = Math.random() * 0.5 - 0.25;
+  }
+
+  Particle.prototype.update = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+  };
+
+  Particle.prototype.draw = function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#333';
+    ctx.fill();
+    ctx.closePath();
+  };
+
+  function drawLine(p1, p2) {
+    const dx = p1.x - p2.x;
+    const dy = p1.y - p2.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= connectionDistance) {
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.strokeStyle = '#333';
+      ctx.stroke();
+      ctx.closePath();
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+      for (let j = i + 1; j < particles.length; j++) {
+        drawLine(particles[i], particles[j]);
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+
+  function init() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight * 0.7;
+
+    for (let i = 0; i < numParticles; i++) {
+      particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height));
+    }
+
+    animate();
+  }
+
+  init();
+</script>
+</body>
+</html>

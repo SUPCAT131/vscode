@@ -1,0 +1,459 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.1.2/dist/echarts.min.js"></script>
+
+<title>客厅控制-99组</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  canvas {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1vh 0;
+    flex: 1;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: row;
+    flex: 8;
+    background-color: transparent;
+  }
+
+  .function {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    padding: 2vh;
+    margin: 2vh;
+    flex: 8;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .section {
+    background-color: rgba(200, 200, 200, 0.5); /* 设置半透明的淡蓝色背景 */
+    backdrop-filter: blur(5px); /* 添加背景模糊效果 */
+    border: 1px solid #ddd;
+    padding: 2vh;
+    flex: 1;
+    margin-left: 2vh;
+
+    display: flex; /* 使用 Flex 布局 */
+    flex-direction: column; /* 设置为垂直排列 */
+/*    justify-content: center; /* 垂直居中 */*/
+  }
+  .section p
+  {
+    text-align:center;
+    font-size: 1.5vw; /* 使用相对单位 vw，您也可以尝试使用 vh */
+  }
+  .footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1vh 0;
+    overflow: hidden;
+    flex: 1;
+
+  }
+.scroll-wrapper{
+  overflow: hidden;
+}
+
+  .scrolling-text {
+    white-space: nowrap;
+    overflow: hidden;
+    animation: scrollingText 10s linear infinite;
+    max-width: 100%; /* 设置最大宽度 */
+  }
+
+  @keyframes scrollingText {
+    0% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+   .section.links {
+    text-align: center; /* 文本居中显示 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 垂直居中显示 */
+  }
+  
+  .section.links a {
+    display: block; /* 每个链接独立一行 */
+    font-size: 2vw; /* 自适应放大字体 */
+    margin-bottom: 2rem; /* 添加一些间距 */
+  }
+  .section.links a:first-child {
+    margin-top: 1rem; /* 设置第一个链接的上外边距 */
+  }
+  a{
+    transition: transform 0.2s ease-in-out;
+    text-decoration: none;
+   border: 2px solid #ccc;
+    padding: 0.1em 0.5em;
+    display: inline-block;
+    width: 8em;
+    position: relative;
+  }
+  a:hover {
+  transform: scale(1.1); /* 在鼠标悬停时缩放 */
+  background-color: rgba(173, 216, 230, 0.5); /* 鼠标悬停时的毛玻璃淡蓝背景颜色 */
+}
+  .section.image-slider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: transparent;
+  }
+
+  .slider-image {
+    width: 100%;
+    height: 100%;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+   object-position: center; /* 图片居中显示 */
+  }
+
+  .slider-image.active {
+    display: block;
+  }
+
+  table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 1px;
+            text-align: left;
+        }
+
+        th {
+            font-weight: bold;
+        }
+
+        td input {
+            width: 100%;
+            padding: 5px;
+        }
+
+</style>
+
+</head>
+<body>
+<header>
+  <h1>客厅环境信息</h1>
+</header>
+<canvas id="canvas" style="position: absolute;" ></canvas>
+<div class="content">
+  <div class="function">
+    <div class="section">
+      <!-- 第一个小区域内容 -->
+      <center>
+        <font  size="+2">实时监控</font>
+        <img 
+         src="http://192.168.1.157:8080/?action=stream"
+         alt="http://192.168.1.157:8080/?action=stream" width="100%"
+         height="100%"></img>
+       </center>
+    </div>
+    <div class="section" style="display: flex; flex-direction: column;">
+      <!-- 第二个小区域内容 -->
+      <center>
+        <font  size="+2">环境信息</font>
+        <div style=" width: 100%;">
+          <iframe src="../cgi-bin/getvalue.cgi" id="dataFrame" height="310" width="300">
+          </iframe>
+        </div>
+        <div style="width: 100%;">
+          <canvas id="temperatureHumidityChart"></canvas>
+        </div>
+      </center> 
+    </div>
+    <div class="section">
+      <!-- 第三个小区域内容 -->
+        <div class="divtable3">
+        <center>
+          <font  size="+2">阈值设置</font>
+          <form action="../cgi-bin/living_set.cgi" method="get">
+          <br>
+          温度上限:
+          <input type="text" name="temp_up" value="" size=10/><br>
+          温度下限:
+          <input type="text" name="temp_low" value="" size=10/><br><br>
+          湿度上限:
+          <input type="text" name="hum_up" value="" size=10/><br>
+          湿度下限:
+          <input type="text" name="hum_low" value="" size=10/><br><br>
+          光强上限:
+          <input type="text" name="illu_up" value="" size=10/><br>
+          光强下限:
+          <input type="text" name="illu_low" value="" size=10/><br><br>
+          <br>
+          <input type="submit" name="set_button" value="提交" />
+          <input type="reset" name="reset" value="重置"/>
+          </form>   
+        </center>
+      </div>
+    </div>
+    <div class="section">
+      <!-- 第四个小区域内容 -->
+      <div class="divtable4">
+        <center>
+          <font  size="+2">电器控制</font>
+          <form action="../cgi-bin/living_dev.cgi" method="get"><br>
+            照明:<br>
+            <input type="radio" name="LED" value="ON">开
+            <input type="radio" name="LED" value="OFF"checked>关<br><br>
+            <br>空调:<br>
+            <input type="radio" name="FAN" value="ON">开
+            <input type="radio" name="FAN" value="OFF" checked>关<br><br>
+              
+            <br>加湿器:<br>
+            <input type="radio" name="BEEP" value="ON">开
+            <input type="radio" name="BEEP" value="OFF" checked>关<br><br>
+            <input type="submit" name="login_button" value="提交" />
+            <input type="reset" name="reset" value="重置"/>
+          </form>
+        </center>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer">
+  <div class="scroll-wrapper">
+    <div class="scrolling-text">
+      <p>版权声明 © 2023 您的公司名称。保留所有权利。</p>
+    </div>
+  </div> 
+</div>
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+  const numParticles = 100;
+  const connectionDistance = 50;
+
+  function Particle(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = Math.random() * 0.5 - 0.25;
+    this.vy = Math.random() * 0.5 - 0.25;
+  }
+
+  Particle.prototype.update = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+  };
+
+  Particle.prototype.draw = function() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#333';
+    ctx.fill();
+    ctx.closePath();
+  };
+
+  function drawLine(p1, p2) {
+    const dx = p1.x - p2.x;
+    const dy = p1.y - p2.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= connectionDistance) {
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.strokeStyle = '#333';
+      ctx.stroke();
+      ctx.closePath();
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+      for (let j = i + 1; j < particles.length; j++) {
+        drawLine(particles[i], particles[j]);
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+
+  function init() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight * 0.7;
+
+    for (let i = 0; i < numParticles; i++) {
+      particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height));
+    }
+
+    animate();
+  }
+
+  init();
+
+  const canvas2 = document.getElementById('temperatureHumidityChart');
+  const ctx2 = canvas2.getContext('2d');
+
+  // 初始化温湿度图表
+  var temperatureHumidityChart = echarts.init(canvas2);
+
+  const temperatureData = [];
+  const humidityData = [];
+  const labels = [];
+
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        animation: false,
+      },
+    },
+    grid: {
+    left: '10%',   // 左边距
+    right: '10%',  // 右边距
+    bottom: '5%', // 底边距
+    top: '25%',    // 顶边距
+    containLabel: true, // 是否包含坐标轴标签等内容
+    },
+    xAxis: {
+      type: 'time',
+      title: {
+        text: '时间'
+      },
+        axisLabel: {
+        show: false, // 将时间轴标签隐藏
+        interval:  30 * 1000, // 每隔两个小时显示一个刻度
+      },
+    },
+    yAxis: [
+      {
+        type: 'value',
+        name: '温度 (℃)',
+        min:Math.min(...temperatureData.map(item => item.value[1])) + 1,
+        interval: 2, // 调整刻度之间的距离
+      },
+      {
+        type: 'value',
+        name: '湿度 (%)',
+        min:Math.min(...humidityData.map(item => item.value[1])) + 1,
+        interval: 3, // 调整刻度之间的距离
+      },
+    ],
+    series: [
+    {
+      name: '温度',
+      type: 'line',
+      data: temperatureData,
+      showSymbol: false,
+      smooth: true,
+      markPoint: {
+        data: [
+          { type: 'max', name: '最高值' }, // 最高值的标记点
+          { type: 'min', name: '最低值' }, // 最低值的标记点
+        ],
+      },
+    },
+    {
+      name: '湿度',
+      type: 'line',
+      data: humidityData,
+      yAxisIndex: 1,
+      showSymbol: false,
+      smooth: true,
+      markPoint: {
+        data: [
+          { type: 'max', name: '最高值' }, // 最高值的标记点
+          { type: 'min', name: '最低值' }, // 最低值的标记点
+        ],
+      },
+    },
+  ],
+  };
+
+  // 设置温湿度图表的配置项和数据
+  temperatureHumidityChart.setOption(option);
+
+// 监听 iframe 的加载事件
+const iframe = document.getElementById('dataFrame');
+setInterval(function() {
+  iframe.src = "../cgi-bin/getvalue.cgi?" + new Date().getTime(); // 加入时间戳以避免缓存
+
+      // 获取 iframe 内部文档
+      const iframeDocument = iframe.contentDocument;
+
+      // 获取温度和湿度的 <td> 元素
+      const temperatureElement = iframeDocument.getElementById('value1');
+      const humidityElement = iframeDocument.getElementById('value2');
+
+      // 从 <td> 元素中获取文本内容
+      const temperatureText = temperatureElement.textContent;
+      const humidityText = humidityElement.textContent;
+      
+      // 使用正则表达式提取数字部分（23.00℃ 或 50.00%）
+      const temperatureValue = parseFloat(temperatureText.match(/\d+\.\d+/)[0]);
+      const humidityValue = parseFloat(humidityText.match(/\d+\.\d+/)[0]);
+
+      const now = new Date();
+      
+      temperatureData.push({ name: now.toLocaleTimeString(), value: [now, temperatureValue] });
+      humidityData.push({ name: now.toLocaleTimeString(), value: [now, humidityValue] });
+
+      const maxDataPoints = 30;
+      if (temperatureData.length > maxDataPoints) {
+        temperatureData.shift();
+        humidityData.shift();
+      }
+      
+      // 更新温湿度图表
+      temperatureHumidityChart.setOption({
+        series: [
+          {
+            data: temperatureData,
+          },
+          {
+            data: humidityData,
+          },
+        ],
+      });
+}, 2000); // 每秒刷新
+
+ 
+
+  
+</script>
+</body>
+</html>
