@@ -49,24 +49,26 @@ void showmsg()
     // printf("</body>\n");
     // printf("</html>\n");
 
-   printf("Content-type: text/html;charset=utf-8\n\n");
+    printf("Content-type: text/html;charset=utf-8\n\n");
     printf("<html>\n");
     printf("<head>\n");
-    printf("<title>Form Submission Result</title>\n");
-    // ... 其他头部内容 ...
     printf("<script type='text/javascript'>\n");
     printf("window.onload = function() {\n");
     printf("    setTimeout(function() {\n");
-    printf("        window.close();\n");  // 关闭当前窗口
-    printf("    }, 1000);  // 1000 毫秒后关闭页面（1 秒）\n");
+    printf("        closePage();\n"); // 调用关闭网页的函数
+    printf("    }, 1000);  // 5000 毫秒后关闭页面（5 秒）\n");
     printf("};\n");
+    printf("function closePage() {\n");
+    printf("    window.close();\n");
+    printf("}\n");
     printf("</script>\n");
     printf("</head>\n");
     printf("<body>\n");
     printf("<h1>修改已成功提交</h1>\n");
-    // ... 其他页面内容 ...
     printf("</body>\n");
     printf("</html>\n");
+
+
 }
 void showerr(char *errmsg)
 {
@@ -79,17 +81,17 @@ void showerr(char *errmsg)
 }
 void send_s_1(int msgqid,k_msgt* km)
 {
-    msg_t1 msg;
+    msg_t msg;
     msg.mtype=1;
-    msg.int_v[0]=km->hum[0];
-    msg.int_v[1]=km->hum[1];
-    msgsnd(msgqid,&msg,sizeof(int[2]),0);
-    msg.int_v[0]=km->tmp[0];
-    msg.int_v[1]=km->tmp[1];
-    msgsnd(msgqid,&msg,sizeof(int[2]),0);
-    msg.int_v[0]=km->light[0];
-    msg.int_v[1]=km->light[1];
-    msgsnd(msgqid,&msg,sizeof(int[2]),0);
+    msg.data.int_v[0]=km->hum[0];
+    msg.data.int_v[1]=km->hum[1];
+    msgsnd(msgqid,&msg,MSGSIZE,0);
+    msg.data.int_v[0]=km->tmp[0];
+    msg.data.int_v[1]=km->tmp[1];
+    msgsnd(msgqid,&msg,MSGSIZE,0);
+    msg.data.int_v[0]=km->light[0];
+    msg.data.int_v[1]=km->light[1];
+    msgsnd(msgqid,&msg,MSGSIZE,0);
 }
 
 int cgiMain(int argc, const char *argv[])

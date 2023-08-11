@@ -28,9 +28,16 @@ typedef struct  // 上述结构体封装为一个总结构体
 
 typedef struct
 {
+    int int_v[2];     // 消息的类型，必须大于0
+    char ctl;    // ctl[1]
+}data_t;
+
+typedef struct
+{
     long mtype;     //消息的类型，必须大于0
-    int int_v[2];
-}msg_t1;
+    data_t data;
+}msg_t;
+
 
 #define MSGSIZE (sizeof(msg_t)-sizeof(long))
 
