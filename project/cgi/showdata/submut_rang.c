@@ -14,12 +14,6 @@ char c_hum_low[40]={0};
 char c_illu_up[40]={0};
 char c_illu_low[40]={0};
 
-int temp_up=0;
-int temp_low=0;
-int hum_up=0;
-int hum_low=0;
-int illu_up=0;
-int illu_low=0;
 void showmsg()
 {
     printf("<html>\n");
@@ -48,7 +42,7 @@ void showerr(char *errmsg)
 }
 void send_s_1(int msgqid,k_msgt* km)
 {
-    msg_t msg;
+    msg_t1 msg;
     msg.mtype=1;
     msg.int_v[0]=km->hum[0];
     msg.int_v[1]=km->hum[1];
@@ -99,9 +93,6 @@ int cgiMain(int argc, const char *argv[])
         return 0;
     }
         // 3.向消息队列中发消息
-    msg_t msg1;
-    msg1.mtype = 1;
-    // msgsnd(msgqid,km,MSGSIZE,0);
     send_s_1(msgqid,&k_m1);
     
     return 0;

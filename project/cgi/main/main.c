@@ -13,23 +13,8 @@ int hum_up=0;
 int hum_low=0;
 int illu_up=0;
 int illu_low=0;
-// void showmsg()
-// {
-//     printf("<html>\n");
-//     printf("<head><title>CGI Output</title></head>\n");
-//     printf("<body>\n");
-//     printf("<table border=\"1\">\n");
-//     printf("<tr><th>变量</th><th>接收的值</th></tr>\n");
-//     printf("<tr><td>c_temp_up</td><td>%d</td></tr>\n", temp_up );
-//     printf("<tr><td>c_temp_low</td><td>%d</td></tr>\n", temp_low);
-//     printf("<tr><td>c_hum_up</td><td>%d</td></tr>\n", hum_up );
-//     printf("<tr><td>c_hum_low</td><td>%d</td></tr>\n", hum_low );
-//     printf("<tr><td>c_illu_up</td><td>%d</td></tr>\n", illu_up);
-//     printf("<tr><td>c_illu_low</td><td>%d</td></tr>\n", illu_low );
-//     printf("</table>\n");
-//     printf("</body>\n");
-//     printf("</html>\n");
-// }
+
+// 测试接收 单 阈值数据 测试通过
 void showmsg1(k_msgt *km)
 {
     printf("--2 k_m.tmp[1] =%d\n", km->tmp[1] );
@@ -39,15 +24,7 @@ void showmsg1(k_msgt *km)
     printf("--2 k_m.light[1] =%d\n", km->light[1]);
     printf("--2 k_m.light[0] =%d\n", km->light[0]);
 }
-void showmsg2()
-{
-    printf("c_temp_up =%d\n", temp_up );
-    printf("c_temp_low =%d\n", temp_low);
-    printf("c_hum_up =%d\n", hum_up );
-    printf("c_hum_low =%d\n", hum_low );
-    printf("c_illu_up =%d\n", illu_up);
-    printf("c_illu_low =%d\n", illu_low );
-}
+
 void showerr(char *errmsg)
 {
     printf("<html>\n");
@@ -57,9 +34,10 @@ void showerr(char *errmsg)
     printf("</body>\n");
     printf("</html>\n");
 }
+// 阈值接收函数 测试通过
 void recv_s_1(k_msgt* km,int msgqid)
 {
-    msg_t msg;
+    msg_t1 msg;
     msg.mtype=1;
     msgrcv(msgqid,&msg,sizeof(int[2]),msg.mtype,0);
     km->hum[0]=msg.int_v[0];
@@ -70,13 +48,6 @@ void recv_s_1(k_msgt* km,int msgqid)
     msgrcv(msgqid,&msg,sizeof(int[2]),msg.mtype,0);
     km->light[0]=msg.int_v[0];
     km->light[1]=msg.int_v[1];
-    printf("--1 k_m.tmp[1] =%d\n", km->tmp[1] );
-    printf("--1 k_m.tmp[0] =%d\n", km->tmp[0]);
-    printf("--1 k_m.hum[1] =%d\n", km->hum[1] );
-    printf("--1 k_m.hum[0] =%d\n", km->hum[0] );
-    printf("--1 k_m.light[1] =%d\n", km->light[1]);
-    printf("--1 k_m.light[0] =%d\n", km->light[0]);
-    
 }
 int main(int argc, const char *argv[])
 {
@@ -104,24 +75,15 @@ int main(int argc, const char *argv[])
     }
         // 3.消息队列接收消息 
     int ret;
-    msg_t msg1;
+    msg_t1 msg1;
     big_msgt bigms={0};
     k_msgt k_m={0};
     msg1.mtype = 1;
-    //msg1.msg=&bigms;
     while (1)
     {
         memset(&k_m,0,sizeof(k_m));
         recv_s_1(&k_m,msgqid);
-        // msgrcv(msgqid,&msg1,sizeof(bigms),msg1.mtype,0);
-        // temp_up=bigms.k_m.tmp[1];
-        // temp_low=bigms.k_m.tmp[0];
-        // hum_up=bigms.k_m.hum[1];
-        // hum_low=bigms.k_m.hum[0];
-        // illu_up=bigms.k_m.light[1];
-        // illu_low=bigms.k_m.light[0];
         showmsg1(&k_m);
-        // showmsg2();
         if(msg1.mtype == 1000) break;
     }
     return 0;

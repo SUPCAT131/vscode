@@ -26,6 +26,9 @@ big_msgt 上述结构体封装为一个总结构体
     char ctl;   8bit [0:2] LED1 LED2 LED3 [3] FAN [4] 马达
     char flg; //标志位 [0] r_m有内容 [1] k_m有内容 [2] 控制设备有内容 0000 0111 表示全有内容
 }                      
+消息队列中的 消息类型
+    key=ftok("/www/home",'s');
+        1 --- 设置阈值 原 发送到消息队列 's' set value 
 
 --页面提交
     --提交1.cgi submit_rang.cgi
