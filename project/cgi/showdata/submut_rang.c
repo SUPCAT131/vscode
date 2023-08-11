@@ -46,6 +46,21 @@ void showerr(char *errmsg)
     printf("</body>\n");
     printf("</html>\n");
 }
+void send_s_1(int msgqid,k_msgt* km)
+{
+    msg_t msg;
+    msg.mtype=1;
+    msg.int_v[0]=km->hum[0];
+    msg.int_v[1]=km->hum[1];
+    msgsnd(msgqid,&msg,sizeof(int[2]),0);
+    msg.int_v[0]=km->tmp[0];
+    msg.int_v[1]=km->tmp[1];
+    msgsnd(msgqid,&msg,sizeof(int[2]),0);
+    msg.int_v[0]=km->light[0];
+    msg.int_v[1]=km->light[1];
+    msgsnd(msgqid,&msg,sizeof(int[2]),0);
+}
+
 int cgiMain(int argc, const char *argv[])
 {
     cgiFormString("temp_up",c_temp_up,sizeof(c_temp_up));
@@ -63,16 +78,9 @@ int cgiMain(int argc, const char *argv[])
         .tmp[0]=atoi(c_temp_low),
         .tmp[1]=atoi(c_temp_up),
         .light[0]=atoi(c_illu_low),
-        .light[1]=atoi(c_hum_up),
+        .light[1]=atoi(c_illu_up),
     };
-    r_msgt r_m1={0};
-    big_msgt bigms={
-        .k_m=k_m1,
-        .r_m=r_m1,
-        .ctl=0,
-        .flg=0x1<<1,
-    };
-
+    
     // 创建消息队列
     key_t key;
     int msgqid;
@@ -91,12 +99,10 @@ int cgiMain(int argc, const char *argv[])
         return 0;
     }
         // 3.向消息队列中发消息
-    int ret;
     msg_t msg1;
     msg1.mtype = 1;
-    msg1.msg=&bigms;
-
-    msgsnd(msgqid, &msg1, sizeof(bigms), 0);
+    // msgsnd(msgqid,km,MSGSIZE,0);
+    send_s_1(msgqid,&k_m1);
     
     return 0;
 }

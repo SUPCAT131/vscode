@@ -30,6 +30,15 @@ int illu_low=0;
 //     printf("</body>\n");
 //     printf("</html>\n");
 // }
+void showmsg1(k_msgt *km)
+{
+    printf("--2 k_m.tmp[1] =%d\n", km->tmp[1] );
+    printf("--2 k_m.tmp[0] =%d\n", km->tmp[0]);
+    printf("--2 k_m.hum[1] =%d\n", km->hum[1] );
+    printf("--2 k_m.hum[0] =%d\n", km->hum[0] );
+    printf("--2 k_m.light[1] =%d\n", km->light[1]);
+    printf("--2 k_m.light[0] =%d\n", km->light[0]);
+}
 void showmsg2()
 {
     printf("c_temp_up =%d\n", temp_up );
@@ -47,6 +56,27 @@ void showerr(char *errmsg)
     printf("<p>errmsg : %s</p>",errmsg);
     printf("</body>\n");
     printf("</html>\n");
+}
+void recv_s_1(k_msgt* km,int msgqid)
+{
+    msg_t msg;
+    msg.mtype=1;
+    msgrcv(msgqid,&msg,sizeof(int[2]),msg.mtype,0);
+    km->hum[0]=msg.int_v[0];
+    km->hum[1]=msg.int_v[1];
+    msgrcv(msgqid,&msg,sizeof(int[2]),msg.mtype,0);
+    km->tmp[0]=msg.int_v[0];
+    km->tmp[1]=msg.int_v[1];
+    msgrcv(msgqid,&msg,sizeof(int[2]),msg.mtype,0);
+    km->light[0]=msg.int_v[0];
+    km->light[1]=msg.int_v[1];
+    printf("--1 k_m.tmp[1] =%d\n", km->tmp[1] );
+    printf("--1 k_m.tmp[0] =%d\n", km->tmp[0]);
+    printf("--1 k_m.hum[1] =%d\n", km->hum[1] );
+    printf("--1 k_m.hum[0] =%d\n", km->hum[0] );
+    printf("--1 k_m.light[1] =%d\n", km->light[1]);
+    printf("--1 k_m.light[0] =%d\n", km->light[0]);
+    
 }
 int main(int argc, const char *argv[])
 {
@@ -76,18 +106,22 @@ int main(int argc, const char *argv[])
     int ret;
     msg_t msg1;
     big_msgt bigms={0};
+    k_msgt k_m={0};
     msg1.mtype = 1;
-    msg1.msg=&bigms;
+    //msg1.msg=&bigms;
     while (1)
     {
-        msgrcv(msgqid,&msg1,sizeof(bigms),msg1.mtype,0);
-        temp_up=bigms.k_m.tmp[1];
-        temp_low=bigms.k_m.tmp[0];
-        hum_up=bigms.k_m.hum[1];
-        hum_low=bigms.k_m.hum[0];
-        illu_up=bigms.k_m.light[1];
-        illu_low=bigms.k_m.light[0];
-        showmsg2();
+        memset(&k_m,0,sizeof(k_m));
+        recv_s_1(&k_m,msgqid);
+        // msgrcv(msgqid,&msg1,sizeof(bigms),msg1.mtype,0);
+        // temp_up=bigms.k_m.tmp[1];
+        // temp_low=bigms.k_m.tmp[0];
+        // hum_up=bigms.k_m.hum[1];
+        // hum_low=bigms.k_m.hum[0];
+        // illu_up=bigms.k_m.light[1];
+        // illu_low=bigms.k_m.light[0];
+        showmsg1(&k_m);
+        // showmsg2();
         if(msg1.mtype == 1000) break;
     }
     return 0;
